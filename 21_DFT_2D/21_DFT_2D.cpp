@@ -16,12 +16,13 @@ const float PI = 3.1415926f;
 
 int main(int argc, char** argv)
 {
-	const int X = 32;
-	const int Y = 32;
+	const int X = 8;
+	const int Y = 8;
 
 	// Generate data
 	sigd data;
 	data.resize(X * Y);
+#if 0
 	for (auto y = 0u; y < Y; y++)
 	{
 		for (auto x = 0u; x < X; x++)
@@ -31,8 +32,23 @@ int main(int argc, char** argv)
 			data[i] = (x == 0 && y == 0) ? (float)(X * Y) : 0.0f;
 		}
 	}
+#else
+	//http://fourier.eng.hmc.edu/e161/lectures/fourier/node12.html
+	data[10] = 70;
+	data[11] = 80;
+	data[12] = 90;
+	data[18] = 90;
+	data[19] = 100;
+	data[20] = 110;
+	data[26] = 110;
+	data[27] = 120;
+	data[28] = 130;
+	data[34] = 130;
+	data[35] = 140;
+	data[36] = 150;
+#endif
 
-	// Fourier transform @ X-axis
+	// Fourier transform
 	fftd fd;
 	fd.resize(data.size());
 	for (auto y = 0u; y < Y; y++)
@@ -41,37 +57,19 @@ int main(int argc, char** argv)
 		{
 			auto i = y * X + x;
 			auto& c = fd[i];
-			for (auto j = 0u; j < X; j++)
+			for (auto k = 0u; k < Y; k++)
 			{
-				auto h = y * X + j;
+				for (auto j = 0u; j < X; j++)
+				{
+					auto h = k * X + j;
 #if 0
-				float r = data[j] * cosf(2.0f * PI * j * x / X);
-				float m = -data[j] * sinf(2.0f * PI * j * x / X);
-				c += fft_t(r, m);
+					float r = data[j] * cosf(2.0f * PI * j * x / X);
+					float m = -data[j] * sinf(2.0f * PI * j * x / X);
+					c += fft_t(r, m);
 #else
-				c += data[h] * exp(fft_t(0, -2.0f * PI * j * x / X));
+					c += data[h] * exp(fft_t(0, -2.0f * PI * ((j * x / (float)X) + (k * y / (float)Y))));
 #endif
-			}
-		}
-	}
-
-	// Fourier transform @ Y-axis
-	for (auto x = 0u; x < X; x++)
-	{
-		for (auto y = 0u; y < Y; y++)
-		{
-			auto i = y * X + x;
-			auto& c = fd[i];
-			for (auto j = 0u; j < Y; j++)
-			{
-				auto h = j * X + x;
-#if 0
-				float r = data[j] * cosf(2.0f * PI * j * y / Y);
-				float m = -data[j] * sinf(2.0f * PI * j * y / Y);
-				c += fft_t(r, m);
-#else
-				c += data[h] * exp(fft_t(0, -2.0f * PI * j * y / Y));
-#endif
+				}
 			}
 		}
 	}
