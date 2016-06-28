@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	// Calcurate spectrum
 	sigd ampl;
 	ampl.resize(N);
-	transform(fd.cbegin(), fd.cend(), ampl.begin(), [](auto& c) {
+	transform(fd.cbegin(), fd.cend(), ampl.begin(), [N](auto& c) {
 		return sqrtf(norm(c)) / N;
 	});
 
